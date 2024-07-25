@@ -22,6 +22,21 @@ import {
 } from "@pezzo/types";
 import { PaginatedReportsResult } from "./object-types/request-report-result.model";
 
+function convertToCustomFormat(isoDate) {
+  const date = new Date(isoDate);
+
+  // Extract date components
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+
+  // Format the date into 'YYYY-MM-DD HH:MM:SS'
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 @Injectable()
 export class ReportingService {
   constructor(private clickHouseService: ClickHouseService) {}
@@ -37,11 +52,14 @@ export class ReportingService {
     const reportId = randomUUID();
     const { report, calculated } = buildRequestReport(dto);
 
+    console.log("report", report);
+    console.log("calculated", calculated);
+
     const { metadata, request, response, cacheEnabled, cacheHit } = report;
 
     const reportToSave: ReportSchema = {
       id: reportId,
-      timestamp: request.timestamp,
+      timestamp: convertToCustomFormat(request.timestamp),
       organizationId: ownership.organizationId,
       projectId: ownership.projectId,
       promptCost: (calculated as any).promptCost,
@@ -58,16 +76,18 @@ export class ReportingService {
       provider: metadata.provider,
       modelAuthor: "openai",
       type: "ChatCompletion",
-      requestTimestamp: request.timestamp,
+      requestTimestamp: convertToCustomFormat(request.timestamp),
       requestBody: JSON.stringify(request.body),
       isError: (response as any).status !== 200,
       responseStatusCode: (response as any).status,
-      responseTimestamp: response.timestamp,
+      responseTimestamp: convertToCustomFormat(response.timestamp),
       responseBody: JSON.stringify(response.body),
       cacheEnabled: cacheEnabled,
       cacheHit: cacheHit,
       promptId: report.metadata.promptId || null,
     };
+
+    console.log("reportToSave", reportToSave);
 
     try {
       await this.clickHouseService.client.insert({
