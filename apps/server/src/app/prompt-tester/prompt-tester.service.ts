@@ -37,6 +37,7 @@ export class PromptTesterService {
 
     const pezzoOpenAI = new PezzoOpenAI(mockPezzo as unknown as Pezzo, {
       apiKey: testerApiKey,
+      baseURL: process.env["OPENAI_BASE_URL"] || undefined,
     });
 
     const mockRequest: any = {

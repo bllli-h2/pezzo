@@ -3,3 +3,4 @@ export * from "./request";
 export * from "./ts-helpers";
 export * from "./provider.types";
 export * from "./reports";
+export * from "./h2-toolkit";

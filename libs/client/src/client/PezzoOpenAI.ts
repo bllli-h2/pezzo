@@ -32,6 +32,15 @@ export class PezzoOpenAI {
     pezzo: Pezzo,
     configuration?: ConstructorParameters<typeof OpenAI>[0]
   ) {
+    // read from env
+    const OPENAI_BASE_URL = process.env["OPENAI_BASE_URL"];
+    if (OPENAI_BASE_URL) {
+      configuration = {
+        ...configuration,
+        baseURL: OPENAI_BASE_URL,
+      };
+    }
+
     this.openai = new OpenAI(configuration);
     this.chat = new Chat(pezzo, this.openai);
   }

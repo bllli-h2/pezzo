@@ -21,6 +21,7 @@
       "@pezzo/types": ["libs/types/src/index.ts"],
       "@pezzo/ui": ["libs/ui/src/index.ts"],
       "@pezzo/ui/*": ["libs/ui/src/*"],
+      "@h2/types": ["libs/types/src/index.ts"],
       "~/*": ["apps/console/src/*"]
     }
   },
